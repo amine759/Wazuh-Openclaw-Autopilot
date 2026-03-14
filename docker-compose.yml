@@ -1,7 +1,28 @@
 # =============================================================================
-# Wazuh OpenClaw Autopilot - Docker Compose Configuration
+# DEPRECATED: This file is maintained for backward compatibility only.
 # =============================================================================
-# Development and production deployment configuration
+# 
+# This standalone compose file has been consolidated into the main
+# docker-compose.yml at the project root using Docker Compose profiles.
+#
+# NEW USAGE (Recommended):
+#   From project root:
+#     docker compose -f ../docker-compose.yml --profile autopilot-runtime up --build -d
+#
+# OLD USAGE (Still works, but not recommended):
+#   From this directory:
+#     docker compose -f docker-compose.yml up --build -d
+#
+# =============================================================================
+# For standalone Autopilot Runtime deployment, use the main compose file:
+#   cd ../../
+#   docker compose --profile autopilot-runtime up --build -d
+#
+# The main compose file includes:
+#   - Security hardening (read-only filesystem, dropped capabilities)
+#   - Proper volume mounts
+#   - Health checks
+#   - Configurable ports via RUNTIME_PORT environment variable
 # =============================================================================
 
 services:
