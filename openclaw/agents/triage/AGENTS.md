@@ -177,16 +177,16 @@ Emit a JSON object for each triaged alert. Example:
 
 ## MANDATORY: Update Case Status via API
 
-**After completing triage, you MUST invoke the `web_fetch` tool to advance the pipeline.** If you skip this step, the pipeline stalls and no downstream agents are triggered.
+**After completing triage, you MUST invoke `exec` with `curl` to advance the pipeline.** If you skip this step, the pipeline stalls and no downstream agents are triggered.
 
-Invoke the `web_fetch` tool with the following URL (replace `{case_id}` with the actual case ID from the webhook message, and use your `AUTOPILOT_MCP_AUTH` token):
+Invoke `exec` with `curl` with the following URL (replace `{case_id}` with the actual case ID from the webhook message, and use your `AUTOPILOT_MCP_AUTH` token):
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&token=<AUTOPILOT_MCP_AUTH>'")
 
 To attach your triage results, add a URL-encoded JSON `data` parameter:
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&data=%7B%22summary%22%3A%22your+triage+summary%22%7D&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&data=%7B%22summary%22%3A%22your+triage+summary%22%7D&token=<AUTOPILOT_MCP_AUTH>'")
 
-**Do NOT write the URL as text.** You must actually invoke the `web_fetch` tool so the HTTP request is made. Writing the URL in a code block does nothing — the runtime only advances the pipeline when it receives the HTTP request.
+**Do NOT write the URL as text.** You must actually invoke `exec` with `curl` so the HTTP request is made. Writing the URL in a code block does nothing — the runtime only advances the pipeline when it receives the HTTP request.
 
 **This is not optional.** The runtime uses your status update to dispatch the webhook that activates the Correlation Agent. Without this call, the case sits in `open` state forever.

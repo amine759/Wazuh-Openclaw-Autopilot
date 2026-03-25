@@ -4,17 +4,17 @@
 
 The Runtime Service runs on port 9090 by default (configurable via `RUNTIME_PORT` env var).
 
-> **Note**: These endpoints use GET with query parameters because OpenClaw's `web_fetch` tool only supports GET requests (no custom headers). Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+> **Note**: These endpoints use GET with query parameters because we use `curl` via `exec` for API calls. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 ### Retrieve a Plan for Evaluation
 
-    web_fetch(url="http://localhost:9090/api/plans/{plan_id}?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/plans/{plan_id}?token=<AUTOPILOT_MCP_AUTH>'")
 
 Returns the full plan object including `case_id`, `risk_level`, `actions`, and current `status` (proposed/approved/executed/expired). Use this to load the plan before running the policy evaluation chain.
 
 ### Submit Approval Decision
 
-    web_fetch(url="http://localhost:9090/api/agent-action/approve-plan?plan_id={plan_id}&approver_id={approver_id}&decision=allow&reason={reason}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/approve-plan?plan_id={plan_id}&approver_id={approver_id}&decision=allow&reason={reason}&token=<AUTOPILOT_MCP_AUTH>'")
 
 Parameters:
 - `plan_id` (required) — The plan to approve
@@ -25,7 +25,7 @@ Parameters:
 
 ### Submit Execution Authorization (Tier 2)
 
-    web_fetch(url="http://localhost:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>'")
 
 ## Token Validation Flow
 
@@ -82,7 +82,7 @@ Count the evidence items attached to the case. A minimum of 3 evidence items is 
 
 ## Runtime API Access
 
-All runtime API requests use `web_fetch` with GET endpoints. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+All runtime API requests use `exec` with `curl`. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 **Note on inline policy enforcement**: Policy enforcement is now handled inline by the runtime service at plan creation, approval, and execution time. The runtime reads `policy.yaml` and enforces action allowlists, confidence thresholds, approver authorization, and evidence requirements automatically.
 
@@ -90,4 +90,4 @@ The Policy Guard agent is still triggered via webhook for supplementary LLM-base
 
 ## Stalled Pipeline Retries
 
-If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL with the `plan_id` already resolved. Use `web_fetch` to call the provided URL after completing your evaluation — do not construct your own URL when one is provided in the retry message.
+If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL with the `plan_id` already resolved. Use `exec` with `curl` to call the provided URL after completing your evaluation — do not construct your own URL when one is provided in the retry message.

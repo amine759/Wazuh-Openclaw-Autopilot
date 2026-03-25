@@ -1,16 +1,15 @@
 # Triage Agent -- Heartbeat (Cron-Triggered)
 
-**IMPORTANT:** You do NOT have `exec` permissions. Do NOT use `curl`, shell commands, or any CLI tools.
-Use ONLY the `web_fetch` tool for all HTTP requests. `web_fetch` runs on the gateway host and can reach `http://localhost:9090`.
+**IMPORTANT:** Use the `exec` tool with `curl` for all HTTP requests. Do NOT use `web_fetch` (it blocks internal addresses). `curl` can reach `http://127.0.0.1:9090`.
 
 ## 10-Minute Untriaged Alert Sweep
 
 This procedure runs on a 10-minute cron cycle. Follow each step in order.
 
 ### 1. Query for untriaged alerts
-Use `web_fetch` to fetch open cases from the runtime API:
+Use `exec` with `curl` to fetch open cases from the runtime API:
 
-    web_fetch(url="http://localhost:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>'")
 
 Filter the response for cases with status `open` created in the last 10 minutes. Sort by severity descending, limit 100.
 
@@ -24,17 +23,17 @@ For each alert in the critical queue:
 - Extract all entities
 - Calculate severity with modifiers
 - Create case immediately
-- Invoke `web_fetch` to update case status to `triaged` (see AGENTS.md MANDATORY section)
+- Invoke `exec` with `curl` to update case status to `triaged` (see AGENTS.md MANDATORY section)
 
 ### 4. Process general queue
 For each alert in the general queue:
 - Extract entities
 - Calculate severity
 - Create case
-- Invoke `web_fetch` to update case status to `triaged` (see AGENTS.md MANDATORY section)
+- Invoke `exec` with `curl` to update case status to `triaged` (see AGENTS.md MANDATORY section)
 
 ### 5. Tag processed alerts
-Mark all processed cases as `triaged` by invoking `web_fetch` with the update-case endpoint for each case.
+Mark all processed cases as `triaged` by invoking `exec` with `curl` on the update-case endpoint for each case.
 
 ### 6. Log sweep summary
 Record: alerts processed, cases created, highest severity seen, processing duration. This feeds operational metrics.

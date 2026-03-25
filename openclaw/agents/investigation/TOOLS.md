@@ -98,13 +98,13 @@ Sysmon process creation events (rule ID 92001, 92002) contain `processGuid` and 
 
 ## Runtime API Access
 
-The Investigation Agent calls the runtime REST API at `http://localhost:9090` using `web_fetch`. All endpoints use GET requests with query parameters. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+The Investigation Agent calls the runtime REST API at `http://127.0.0.1:9090` using `exec` with `curl`. All endpoints use GET requests with query parameters. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
-> **Note**: These endpoints use GET with query parameters because OpenClaw's `web_fetch` tool only supports GET requests (no custom headers).
+> **Note**: These endpoints use GET with query parameters because we use `curl` via `exec` for API calls.
 
 ### Read Case for Deep Investigation
 
-    web_fetch(url="http://localhost:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>'")
 
 Returns the full case object including triage data, correlation results, entities, and evidence references. Use this as the starting point for pivot queries against the Wazuh indexer.
 
@@ -112,7 +112,7 @@ Returns the full case object including triage data, correlation results, entitie
 
 After completing all pivot queries, baseline comparisons, and IOC extraction, write the findings back and advance the case status.
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&data={url_encoded_json}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&data={url_encoded_json}&token=<AUTOPILOT_MCP_AUTH>'")
 
 The `data` parameter is a URL-encoded JSON object containing your investigation findings:
 
@@ -130,4 +130,4 @@ Setting `status=investigated` automatically triggers the Response Planner.
 
 ## Stalled Pipeline Retries
 
-If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `web_fetch` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.
+If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `exec` with `curl` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.

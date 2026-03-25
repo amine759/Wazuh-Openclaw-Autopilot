@@ -193,16 +193,16 @@ Emit a fully investigated case JSON. Example:
 
 ## MANDATORY: Update Case Status via API
 
-**After completing investigation, you MUST invoke the `web_fetch` tool to advance the pipeline.** If you skip this step, the pipeline stalls and the Response Planner Agent is never triggered.
+**After completing investigation, you MUST invoke `exec` with `curl` to advance the pipeline.** If you skip this step, the pipeline stalls and the Response Planner Agent is never triggered.
 
-Invoke the `web_fetch` tool with the following URL (replace `{case_id}` with the actual case ID from the webhook message):
+Invoke `exec` with `curl` with the following URL (replace `{case_id}` with the actual case ID from the webhook message):
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&token=<AUTOPILOT_MCP_AUTH>'")
 
 To attach your investigation findings, add a URL-encoded JSON `data` parameter:
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&data=%7B%22recommended_response%22%3A%5B%22Block+attacker+IP%22%5D%7D&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=investigated&data=%7B%22recommended_response%22%3A%5B%22Block+attacker+IP%22%5D%7D&token=<AUTOPILOT_MCP_AUTH>'")
 
-**Do NOT write the URL as text.** You must actually invoke the `web_fetch` tool so the HTTP request is made. Writing the URL in a code block does nothing — the runtime only advances the pipeline when it receives the HTTP request.
+**Do NOT write the URL as text.** You must actually invoke `exec` with `curl` so the HTTP request is made. Writing the URL in a code block does nothing — the runtime only advances the pipeline when it receives the HTTP request.
 
 **This is not optional.** The runtime uses your status update to dispatch the webhook that activates the Response Planner Agent. Without this call, the case sits in `correlated` state forever.

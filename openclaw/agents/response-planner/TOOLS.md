@@ -2,11 +2,11 @@
 
 ## Runtime API: Submit Plans
 
-**Endpoint**: `GET http://localhost:9090/api/agent-action/create-plan`
+**Endpoint**: `GET http://127.0.0.1:9090/api/agent-action/create-plan`
 
 The Runtime Service port defaults to 9090 but is configurable via the `RUNTIME_PORT` environment variable.
 
-> **Note**: This endpoint uses GET with query parameters because OpenClaw's `web_fetch` tool only supports GET requests (no custom headers). Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+> **Note**: This endpoint uses GET with query parameters because we use `curl` via `exec` for API calls. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 ### Submitting a Plan
 
@@ -19,7 +19,7 @@ Build the request URL with these query parameters:
 - `actions` (required) — URL-encoded JSON array of actions
 - `token` (required) — Your `AUTOPILOT_MCP_AUTH` token
 
-    web_fetch(url="http://localhost:9090/api/agent-action/create-plan?case_id={case_id}&title={url_encoded_title}&risk_level={level}&actions={url_encoded_json_array}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/create-plan?case_id={case_id}&title={url_encoded_title}&risk_level={level}&actions={url_encoded_json_array}&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Actions JSON structure** (URL-encode this array):
 
@@ -93,16 +93,16 @@ Match the investigation's attack classification to the appropriate playbook (bru
 
 ## Runtime API Access
 
-The Response Planner calls the runtime REST API at `http://localhost:9090` using `web_fetch`. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+The Response Planner calls the runtime REST API at `http://127.0.0.1:9090` using `exec` with `curl`. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 ### Read Case for Context
 
 Before building a response plan, fetch the full case to review investigation findings, correlation data, and severity.
 
-    web_fetch(url="http://localhost:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>'")
 
 The `GET /api/agent-action/create-plan` endpoint for submitting plans is documented above in the "Runtime API: Submit Plans" section.
 
 ## Stalled Pipeline Retries
 
-If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `web_fetch` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.
+If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `exec` with `curl` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.

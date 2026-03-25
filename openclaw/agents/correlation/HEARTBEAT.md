@@ -1,16 +1,15 @@
 # Correlation Agent -- Heartbeat (Cron-Triggered)
 
-**IMPORTANT:** You do NOT have `exec` permissions. Do NOT use `curl`, shell commands, or any CLI tools.
-Use ONLY the `web_fetch` tool for all HTTP requests. `web_fetch` runs on the gateway host and can reach `http://localhost:9090`.
+**IMPORTANT:** Use the `exec` tool with `curl` for all HTTP requests. Do NOT use `web_fetch` (it blocks internal addresses). `curl` can reach `http://127.0.0.1:9090`.
 
 ## 5-Minute Active Case Recorrelation
 
 This procedure runs on a 5-minute cron cycle. Follow each step in order.
 
 ### 1. Fetch new triage cases
-Use `web_fetch` to query the runtime API for triaged cases:
+Use `exec` with `curl` to query the runtime API for triaged cases:
 
-    web_fetch(url="http://localhost:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>'")
 
 Filter the response for cases with status `triaged` created since the last heartbeat (last 5 minutes).
 
@@ -35,7 +34,7 @@ For every modified or new cluster:
 - Apply severity boosts
 
 ### 6. Hand off high-priority clusters
-Any cluster with correlation score >= 0.8 or boosted severity of `critical` — invoke `web_fetch` to update the case status to `correlated` (see AGENTS.md MANDATORY section) to hand off to the Investigation Agent.
+Any cluster with correlation score >= 0.8 or boosted severity of `critical` — invoke `exec` with `curl` to update the case status to `correlated` (see AGENTS.md MANDATORY section) to hand off to the Investigation Agent.
 
 ### 7. Log heartbeat summary
 Record: new cases processed, clusters updated, new clusters formed, clusters handed to investigation, processing duration.

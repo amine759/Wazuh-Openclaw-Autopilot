@@ -191,18 +191,18 @@ Every decision must be a structured JSON object:
 
 ## MANDATORY: Submit Decision via API
 
-**After evaluating the plan, you MUST invoke the `web_fetch` tool to submit your decision.** If you skip this step, the plan stays in `proposed` state and the pipeline stalls.
+**After evaluating the plan, you MUST invoke `exec` with `curl` to submit your decision.** If you skip this step, the plan stays in `proposed` state and the pipeline stalls.
 
-Invoke the `web_fetch` tool with your decision:
+Invoke `exec` with `curl` with your decision:
 
-    web_fetch(url="http://localhost:9090/api/agent-action/approve-plan?plan_id={plan_id}&approver_id={approver_id}&decision={allow|deny|escalate}&reason={url_encoded_reason}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/approve-plan?plan_id={plan_id}&approver_id={approver_id}&decision={allow|deny|escalate}&reason={url_encoded_reason}&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Example (allow):**
 
-    web_fetch(url="http://localhost:9090/api/agent-action/approve-plan?plan_id=PLAN-20260217-def67890&approver_id=policy-guard&decision=allow&reason=All%20policy%20checks%20passed&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/approve-plan?plan_id=PLAN-20260217-def67890&approver_id=policy-guard&decision=allow&reason=All%20policy%20checks%20passed&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Example (deny):**
 
-    web_fetch(url="http://localhost:9090/api/agent-action/approve-plan?plan_id=PLAN-20260217-def67890&approver_id=policy-guard&decision=deny&reason=Action%20targets%20protected%20asset&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/approve-plan?plan_id=PLAN-20260217-def67890&approver_id=policy-guard&decision=deny&reason=Action%20targets%20protected%20asset&token=<AUTOPILOT_MCP_AUTH>'")
 
-**Do NOT write the URL as text.** You must actually invoke the `web_fetch` tool so the HTTP request is made. Writing the URL in a code block does nothing — the runtime never sees it and the plan cannot proceed to human approval.
+**Do NOT write the URL as text.** You must actually invoke `exec` with `curl` so the HTTP request is made. Writing the URL in a code block does nothing — the runtime never sees it and the plan cannot proceed to human approval.

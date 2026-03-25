@@ -55,15 +55,15 @@ Sort by `rule.level` descending so critical alerts are processed first.
 
 ## Runtime API Access
 
-The Triage Agent calls the runtime REST API at `http://localhost:9090` using `web_fetch`. All requests require the auth token as a `token` query parameter.
+The Triage Agent calls the runtime REST API at `http://127.0.0.1:9090` using `exec` with `curl`. All requests require the auth token as a `token` query parameter.
 
-> **Note**: These endpoints use GET with query parameters because OpenClaw's `web_fetch` tool only supports GET requests (no custom headers). Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+> **Note**: These endpoints use GET with query parameters because we use `curl` via `exec` for API calls. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 ### Authentication
 
 All API calls require the `AUTOPILOT_MCP_AUTH` token passed as a query parameter:
 
-    web_fetch(url="http://localhost:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>'")
 
 The token value is provided in your workspace environment. Include `&token=<value>` (or `?token=<value>` if it's the first parameter) on every request.
 
@@ -71,24 +71,24 @@ The token value is provided in your workspace environment. Include `&token=<valu
 
 Check for duplicates before creating a new case.
 
-    web_fetch(url="http://localhost:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>'")
 
 ### Read a Case
 
-    web_fetch(url="http://localhost:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases/{case_id}?token=<AUTOPILOT_MCP_AUTH>'")
 
 ### Update Case Status
 
 Set `status=triaged` to hand off to the Correlation Agent. The runtime automatically dispatches a webhook to trigger the next agent.
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&token=<AUTOPILOT_MCP_AUTH>'")
 
 To include additional data (e.g., entities, timeline), URL-encode a JSON object in the `data` parameter:
 
-    web_fetch(url="http://localhost:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&data={url_encoded_json}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/update-case?case_id={case_id}&status=triaged&data={url_encoded_json}&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Note**: Setting `status=triaged` automatically triggers the Correlation Agent.
 
 ## Stalled Pipeline Retries
 
-If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `web_fetch` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.
+If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL. Use `exec` with `curl` to call the provided URL after completing your analysis — do not construct your own URL when one is provided in the retry message.

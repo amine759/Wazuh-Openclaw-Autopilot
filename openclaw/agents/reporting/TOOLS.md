@@ -5,7 +5,7 @@
 Query the Prometheus endpoint to retrieve SOC operational metrics.
 
 ```
-GET http://localhost:9090/metrics
+GET http://127.0.0.1:9090/metrics
 ```
 
 **Key metrics to extract**:
@@ -101,28 +101,28 @@ Example: `reports/daily_digest/2026-02-17/daily_digest_2026-02-17T08:00:00Z.json
 
 ## Runtime API Access
 
-The Reporting Agent calls the runtime REST API at `http://localhost:9090` using `web_fetch`. All endpoints are GET-based. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+The Reporting Agent calls the runtime REST API at `http://127.0.0.1:9090` using `exec` with `curl`. All endpoints are GET-based. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
 ### Prometheus Metrics
 
 The `/metrics` endpoint does not require auth:
 
-    web_fetch(url="http://localhost:9090/metrics")
+    exec(command="curl -s 'http://127.0.0.1:9090/metrics'")
 
 ### Case Summaries for Report Generation
 
-    web_fetch(url="http://localhost:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/cases?token=<AUTOPILOT_MCP_AUTH>'")
 
 Returns all cases. Use for aggregating case volume, severity distributions, and entity statistics in reports.
 
 ### Completed Plans for Action Reports
 
-    web_fetch(url="http://localhost:9090/api/plans?state=completed&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/plans?state=completed&token=<AUTOPILOT_MCP_AUTH>'")
 
 Returns plans that were successfully executed. Use for action success rate calculations and response time analysis.
 
 ### Failed Plans for Incident Analysis
 
-    web_fetch(url="http://localhost:9090/api/plans?state=failed&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/plans?state=failed&token=<AUTOPILOT_MCP_AUTH>'")
 
 Returns plans that failed during execution. Use for failure analysis, root cause breakdown, and improvement recommendations.

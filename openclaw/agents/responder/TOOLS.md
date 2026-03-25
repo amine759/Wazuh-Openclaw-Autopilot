@@ -4,9 +4,9 @@
 
 Trigger execution of an approved plan via the Runtime Service API.
 
-> **Note**: This endpoint uses GET with query parameters because OpenClaw's `web_fetch` tool only supports GET requests (no custom headers). Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
+> **Note**: This endpoint uses GET with query parameters because we use `curl` via `exec` for API calls. Pass the auth token as `?token=<AUTOPILOT_MCP_AUTH>` on every request.
 
-    web_fetch(url="http://localhost:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Preconditions checked by the service**:
 1. Plan must be in `approved` state (Tier 1 human approval completed)
@@ -19,7 +19,7 @@ Trigger execution of an approved plan via the Runtime Service API.
 
 Verify the responder capability is enabled and healthy before attempting execution.
 
-    web_fetch(url="http://localhost:9090/api/responder/status?token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/responder/status?token=<AUTOPILOT_MCP_AUTH>'")
 
 Port is configurable via `RUNTIME_PORT` env var (default: 9090).
 
@@ -62,4 +62,4 @@ Attach captured evidence to the case store as part of the execution result.
 
 ## Stalled Pipeline Retries
 
-If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL with the `plan_id` already resolved. Use `web_fetch` to call the provided URL after completing your work — do not construct your own URL when one is provided in the retry message.
+If this agent is triggered with a message prefixed `[RETRY]`, it means the case was previously stalled in the pipeline and is being re-dispatched automatically. The message will contain a pre-built callback URL with the `plan_id` already resolved. Use `exec` with `curl` to call the provided URL after completing your work — do not construct your own URL when one is provided in the retry message.

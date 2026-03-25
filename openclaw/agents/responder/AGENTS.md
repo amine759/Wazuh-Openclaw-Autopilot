@@ -39,7 +39,7 @@ Setting `AUTOPILOT_RESPONDER_ENABLED=true` does NOT enable autonomous execution.
 
 Check responder status (default port 9090, configurable via `RUNTIME_PORT` env var):
 ```
-GET http://localhost:9090/api/responder/status
+GET http://127.0.0.1:9090/api/responder/status
 ```
 
 ---
@@ -188,19 +188,19 @@ When `status` is `failed`, populate `error_details` with a descriptive message i
 
 ## MANDATORY: Execute Plan via API
 
-**To execute an approved plan, you MUST invoke the `web_fetch` tool to call the Runtime API.** If you skip this step, no actions are executed.
+**To execute an approved plan, you MUST invoke `exec` with `curl` to call the Runtime API.** If you skip this step, no actions are executed.
 
-Invoke the `web_fetch` tool with the execute-plan endpoint:
+Invoke `exec` with `curl` with the execute-plan endpoint:
 
-    web_fetch(url="http://localhost:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/execute-plan?plan_id={plan_id}&executor_id={executor_id}&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Example:**
 
-    web_fetch(url="http://localhost:9090/api/agent-action/execute-plan?plan_id=PLAN-20260217-def67890&executor_id=responder-agent&token=<AUTOPILOT_MCP_AUTH>")
+    exec(command="curl -s 'http://127.0.0.1:9090/api/agent-action/execute-plan?plan_id=PLAN-20260217-def67890&executor_id=responder-agent&token=<AUTOPILOT_MCP_AUTH>'")
 
 **Preconditions** (checked by the service):
 1. Plan must be in `approved` state (human Tier 1 + Tier 2 approval completed)
 2. `AUTOPILOT_RESPONDER_ENABLED` must be `true`
 3. Action limits and circuit breaker must not be tripped
 
-**Do NOT write the URL as text.** You must actually invoke the `web_fetch` tool so the HTTP request is made. Writing the URL in a code block does nothing — the plan remains in `approved` state and no containment or remediation actions are taken.
+**Do NOT write the URL as text.** You must actually invoke `exec` with `curl` so the HTTP request is made. Writing the URL in a code block does nothing — the plan remains in `approved` state and no containment or remediation actions are taken.
